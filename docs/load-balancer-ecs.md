@@ -1,16 +1,12 @@
 # Using a Load Balancer with ECS Fargate
-This guide goes through the necessary steps to create a Load Balancer and to use it to expose REST APIs hosted on Fargate.
+This guide goes through the necessary steps to create a Load Balancer and to use it to expose a Service hosted on ECS Fargate.
 
 To expose an API on a LB you first need to create a Target Group (basically defines the target for a Load Balancer listener) and a Load Balancer with a Listener that points at that target group.
 
 *In general*: create the TG and LB before creating the ECS service.<br>
 This is needed because when creating the ECS service you willl have the possibility to specify which LB and TG to use and the ECS Service will automatically register the Tasks as Target Group's Targets.
 
-### Important Note
-> The problem with this approach is that you will need **one LB for each service on ECS**.<br> 
-That happens because there is no routing in the LB, only balancing load. 
-
-This is **highly expensive**, since you will pay the full cost of an ALB for **each service**, which would be around **20$ per month** (per service).
+Important: **it is possible to use a single ALB with multiple different ECS Services** in the backend: [it is described in section 2](#configure-a-single-alb-to-serve-multiple-ecs-services).
 
 ## 1. Create a Target Group
 Under `EC2 > Target groups`, create a new Target Group.
@@ -26,7 +22,7 @@ You should skip the target registration. <br>
 The reason being that ECS tasks will self register with the Target Group when creating the ECS Service.<br> 
 *I suggest always starting by creating the Target Group before creating the ECS Service, otherwise you'll have to register the IP Addresses of the different tasks running under the Service as a target in the TG, which is very manual and error-prone.*
 
-## 2. Create an Application Load Balancer
+## 2. Create and configure an Application Load Balancer
 Under `EC2 > Load Balancers`, create a new **Application Load Balancer**.
 
 The ALB in this case should be **Internet Facing**.<br>
@@ -50,7 +46,8 @@ When creating the ECS Service, make sure that you do the following:
 * Use an **existing Target Group** and select the one you created earlier. 
 
 ## 4. Testing that it works
-Using the DNS name of the LB you should be able to call it on port 80 and it will route to the ECS Service.
+Using the DNS name of the LB you should be able to call it on port 80 and it will route to the ECS Service. <br>
+If you have configured **path-based listener rules**, use the right path.
 
 ## 5. Cleaning up resources
 To clean up all the resources in this guide: 
@@ -58,3 +55,8 @@ To clean up all the resources in this guide:
 2. Delete the Load Balancer.
 3. Delete the Target Group.
 4. Delete any additional Subnet that was created for this purpose.
+
+## Resources
+Resources that have been of help: 
+* [ECS Service Load Balancing](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-load-balancing.html)
+* [Q&A on Load Balancing multiple services](https://repost.aws/knowledge-center/elb-achieve-path-based-routing-alb)
