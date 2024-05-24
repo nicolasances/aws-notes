@@ -40,6 +40,19 @@ Any code that uses an AWS SDK (such as boto3 for Python) knows how to access tho
 
 The result is that your code using boto3 will automatically receive credentials that have the permissions associated with the IAM Role assigned to the task.
 
+To do this, you can do the following: 
+1. Create a new role for the ECS Task to use.
+2. Assign the right policies to that role.
+3. Configure that role to be used in the **Task Definition**.
+
+The following is an example of point 2.
+
+![alt text](../img/ecs-task-role.png)
+
+The following is the configuration of point 3: configuring the task role on the task definition. 
+
+![alt text](../img/ecs-task-role-configuration.png)
+
 Sources: 
 * [Stack Overflow question](https://stackoverflow.com/questions/72960237/aws-boto3-botocore-assume-iam-role-in-ecs-task)
 
