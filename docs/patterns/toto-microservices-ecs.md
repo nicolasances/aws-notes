@@ -20,6 +20,12 @@ To **create an ECR Repo**:
  * Go on AWS portal, in ECR, Private Repositories and **Create a Repository**. 
  * Give a name to the repo, and you're done!
 
+### 1.3. Create a VPC, Public Subnet, IGW
+Creating a VPC and Subnet are straightfoward. 
+
+The Internet Gateway is needed to make the subnet public. 
+* The following guide goes through the steps: [Configure a IGW to make a Subnet Public](../making-subnet-public.md)
+
 ### 1.2. Create a Task Definition in ECS
 
 ### 1.3. Create an ECS Cluster
