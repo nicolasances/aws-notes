@@ -25,6 +25,7 @@ Those conditions can be (just citing the most relevant here):
 
 The choice is important, because in case of **path-based** approach, the LB **does not perform any URL rewrite**, which means that the ECS Service needs to provide all its endpoints under the path that is configured in the Listener's rule. 
 
+
 ### 2. Before anything
 Before doing anything you need to setup Target Groups (one for each ECS Service you need to expose on the LB), an ALB and Listener, following [this guide](./load-balancer-ecs.md).
 
@@ -47,7 +48,6 @@ Once done, you should have something like this in the ALB configuration:
 
 ![](../img/listener-rules-multiple-services.png)
 
-
 ### 3.B. Configuration using a Header-based approach
 The header-based approach is **less invasive** as it does not require any modification of the backend service, but it **requires the caller to pass a specific header** that helps the Listener understand which service it needs to route to. 
 
@@ -63,3 +63,19 @@ In that rule, specify a **condition** based on a header.
 Once the configuration is set, you should see something like this (based on the header name you chose): 
 
 ![](../img/listener-rules-multiple-services-header-based.png)
+
+### Important: on CORS
+In general I've had problems with CORS. <br>
+When creating an ALB Listener, there's always a *default* path.<br> 
+That default path is what is used by the preflight requests (OPTIONS) made by a browser, and providing a **fixed** response **does not allow to add HTTP Headers** (like the `Access-Control-Allow-Origin`). <br>
+This means that the OPTIONS pre-flight call always fails. 
+
+*Note that this does not happen in Postman because Postman does not send pre-flight requests, neither does NodeJS request.* The only place where I experience this behaviour is from the browser.
+
+To resolve this I have done the following on the Listener. 
+> Under *Attributes* you can *edit* and *Add response headers*. I added the following headers: 
+> * `Access-Control-Allow-Origin` (setting it to `*`)
+> * `Access-Control-Allow-Headers` (setting it to `*`)
+> * `Access-Control-Allow-Methods` (selecting `GET, HEAD, POST, PUT, DELETE, OPTIONS, PATCH`)
+
+That basically makes sure that those headers are **always added** to any HTTP response sent by **any route** of the Listener. 
