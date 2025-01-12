@@ -9,3 +9,4 @@ This repository contains notes on different AWS services and guides on how to im
 
 * [Configuring Boto3](docs/boto3.md)
 * [Managing Secrets in AWS](docs/managing-secrets.md)
+* [Using Bedrock](docs/bedrock.md)
